@@ -1,0 +1,11 @@
+---
+
+realms:
+  - id: 1
+    name: enigma
+    zone: 3
+    port: 8085
+  - id: 2
+    name: jester
+    zone: 1
+    port: 8086

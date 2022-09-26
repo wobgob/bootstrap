@@ -1,0 +1,66 @@
+---
+
+- name: Set firewall rules for database
+  ufw: rule=allow port=3306
+
+- name: Install MySQL and pip
+  apt:
+    name:
+      - mysql-server
+      - python3-pip
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Enable remote login to MySQL
+  lineinfile:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: '^bind-address'
+      line: 'bind-address = 0.0.0.0'
+      backup: yes
+  notify:
+      - Restart MySQL
+
+- name: Start and enable MySQL
+  systemd:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Install python dependencies
+  pip:
+    name: ['pymysql']
+
+- name: Create auth database
+  community.mysql.mysql_db:
+    name: auth
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create character databases
+  community.mysql.mysql_db:
+    name: "{{ item.name }}_characters"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  with_items: "{{ realms }}"
+
+- name: Create world databases
+  community.mysql.mysql_db:
+    name: "{{ item.name }}_world"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  with_items: "{{ realms }}"
+
+- name: Set MySQL facts
+  set_fact:
+    mysql:
+      user: "{{ lookup('env', 'MYSQL_USER') }}"
+      password: "{{ lookup('env', 'MYSQL_PASSWORD') }}"
+
+- name: Create database user
+  community.mysql.mysql_user:
+    name: "{{ mysql.user }}"
+    password: "{{ mysql.password }}"
+    host: '%'
+    priv: '*.*:ALL'
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock

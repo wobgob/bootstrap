@@ -1,0 +1,17 @@
+---
+
+- name: Install ufw
+  apt:
+    name: ['ufw']
+    update_cache: yes
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Deny everything
+  ufw: policy=deny
+
+- name: Set firewall rules for SSH
+  ufw: rule=allow port=ssh proto=tcp
+
+- name: Enable UFW
+  ufw: state=enabled

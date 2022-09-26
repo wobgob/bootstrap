@@ -1,0 +1,26 @@
+#!/bin/bash
+
+IMAGE="wobgob/core"
+if [ -n "$2" ]; then
+    IMAGE="$2"
+fi
+
+case "${1:-''}" in
+    'start')
+        docker run --name auth --env MYSQL_USER={{ mysql.user }} \
+            --env MYSQL_PASSWORD={{ mysql.password }} --env MYSQL_HOST={{ mysql.host }} \
+            --env MYSQL_PORT={{ mysql.port }} --env AUTHSERVER=1 -p 3724:3724 -d "$IMAGE"
+        exit 0
+        ;;
+
+    'stop')
+        docker stop auth
+        docker rm auth
+        exit 0
+        ;;
+
+    *)
+        echo "Usage: auth start|stop [image]"
+        exit 1
+        ;;
+esac

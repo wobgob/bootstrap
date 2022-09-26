@@ -1,0 +1,73 @@
+---
+
+- name: Set firewall rules for applications
+  ufw: rule=allow port={{ item }}
+  with_items:
+    - 3724
+    - 8085
+    - 8086
+
+- name: Install required system packages
+  apt:
+    pkg:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: latest
+    update_cache: true
+
+- name: Add Docker GPG apt key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: latest
+    update_cache: true
+
+- name: Set MySQL facts
+  set_fact:
+    mysql:
+      user: "{{ lookup('env', 'MYSQL_USER') }}"
+      password: "{{ lookup('env', 'MYSQL_PASSWORD') }}"
+      host: "{{ lookup('env', 'MYSQL_HOST') }}"
+      port: "{{ lookup('env', 'MYSQL_PORT') }}"
+
+- name: Copy auth script
+  template:
+    src: files/auth.j2
+    dest: /usr/local/bin/auth
+    owner: root
+    group: docker
+    mode: '0770'
+
+- name: Copy world scripts
+  template:
+    src: files/world.j2
+    dest: "/usr/local/bin/{{ item.name }}"
+    owner: root
+    group: docker
+    mode: '0770'
+  vars:
+    realm: "{{ item }}"
+  with_items: "{{ realms }}"
+
+- name: Copy winzig script
+  template:
+    src: files/winzig.j2
+    dest: "/usr/local/bin/winzig"
+    owner: root
+    group: docker
+    mode: '0770'

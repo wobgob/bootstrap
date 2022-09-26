@@ -1,0 +1,27 @@
+#!/bin/bash
+
+IMAGE="wobgob/core"
+if [ -n "$2" ]; then
+    IMAGE="$2"
+fi
+
+case "${1:-''}" in
+    'start')
+        docker run --name "{{ realm.name }}" --env MYSQL_USER="{{ mysql.user }}" \
+            --env MYSQL_PASSWORD={{ mysql.password }} --env MYSQL_HOST={{ mysql.host }} \
+            --env MYSQL_PORT={{ mysql.port }} --env ID={{ realm.id }} --env NAME={{ realm.name }} \
+            --env ZONE={{ realm.zone }} -p {{ realm.port }}:8085 -d -it "$IMAGE"
+        exit 0
+        ;;
+
+    'stop')
+        docker stop {{ realm.name }}
+        docker rm {{ realm.name }}
+        exit 0
+        ;;
+
+    *)
+        echo "Usage: {{ realm.name }} start|stop [image]"
+        exit 1
+        ;;
+esac

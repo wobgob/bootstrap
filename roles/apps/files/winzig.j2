@@ -1,0 +1,26 @@
+#!/bin/bash
+
+IMAGE="wobgob/winzig"
+if [ -n "$2" ]; then
+    IMAGE="$2"
+fi
+
+case "${1:-''}" in
+    'start')
+        docker run --name winzig --env DISCORD_BOT_TOKEN={{ lookup('env', 'DISCORD_BOT_TOKEN') }} \
+            --env DATABASE_URI="mysql://{{ mysql.user }}:{{ mysql.password }}:{{ mysql.host }}:{{ mysql.port }}" \
+            "$IMAGE"
+        exit 0
+        ;;
+
+    'stop')
+        docker stop winzig
+        docker rm winzig
+        exit 0
+        ;;
+
+    *)
+        echo "Usage: winzig start|stop [image]"
+        exit 1
+        ;;
+esac
