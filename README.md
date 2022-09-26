@@ -30,5 +30,5 @@ ruby.wobgob.org ansible_host=106.68.33.222
 3. Run the playbook
 
 ```
-$ ./play site.yml
+$ ./bootstrap site.yml
 ```

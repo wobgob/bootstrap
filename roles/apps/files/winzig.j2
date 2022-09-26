@@ -8,8 +8,8 @@ fi
 case "${1:-''}" in
     'start')
         docker run --name winzig --env DISCORD_BOT_TOKEN={{ lookup('env', 'DISCORD_BOT_TOKEN') }} \
-            --env DATABASE_URI="mysql://{{ mysql.user }}:{{ mysql.password }}:{{ mysql.host }}:{{ mysql.port }}" \
-            "$IMAGE"
+            --env DATABASE_URI="mysql://{{ mysql.user }}:{{ mysql.password }}@{{ mysql.host }}:{{ mysql.port }}/auth" \
+            -d "$IMAGE"
         exit 0
         ;;
 
