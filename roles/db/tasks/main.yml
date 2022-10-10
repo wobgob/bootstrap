@@ -55,12 +55,13 @@
     mysql:
       user: "{{ lookup('env', 'MYSQL_USER') }}"
       password: "{{ lookup('env', 'MYSQL_PASSWORD') }}"
+      user_host: "{{ lookup('env', 'MYSQL_USER_HOST') }}"
 
 - name: Create database user
   community.mysql.mysql_user:
     name: "{{ mysql.user }}"
     password: "{{ mysql.password }}"
-    host: '%'
+    host: "{{ mysql.user_host }}"
     priv: '*.*:ALL'
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
