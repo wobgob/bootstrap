@@ -1,6 +1,6 @@
 ---
 
-- name: Install ufw
+- name: Install ufw and fail2ban
   apt:
     name:
       - ufw
@@ -42,8 +42,6 @@
       line: "PasswordAuthentication no"
     - regexp: "^PermitEmptyPasswords\ "
       line: "PermitEmptyPasswords no"
-    - regexp: "^StrictModes\ "
-      line: "StrictModes yes"
     - regexp: "^IgnoreRhosts\ "
       line: "IgnoreRhosts yes"
     - regexp: "^ClientAliveInterval\ "

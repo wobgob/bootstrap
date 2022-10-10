@@ -30,32 +30,55 @@
   pip:
     name: ['pymysql']
 
+- name: Set MySQL facts
+  set_fact:
+    mysql:
+      root_password: "{{ lookup('env', 'MYSQL_ROOT_PASSWORD') }}"
+      user: "{{ lookup('env', 'MYSQL_USER') }}"
+      password: "{{ lookup('env', 'MYSQL_PASSWORD') }}"
+      user_host: "{{ lookup('env', 'MYSQL_USER_HOST') }}"
+
+- name: Change root password
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ mysql.root_password }}"
+    plugin: 'mysql_native_password'
+    update_password: always
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+    check_implicit_admin: yes
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Remove all anonymous user accounts
+  community.mysql.mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+
 - name: Create auth database
   community.mysql.mysql_db:
     name: auth
     state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
 
 - name: Create character databases
   community.mysql.mysql_db:
     name: "{{ item.name }}_characters"
     state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
   with_items: "{{ realms }}"
 
 - name: Create world databases
   community.mysql.mysql_db:
     name: "{{ item.name }}_world"
     state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
   with_items: "{{ realms }}"
-
-- name: Set MySQL facts
-  set_fact:
-    mysql:
-      user: "{{ lookup('env', 'MYSQL_USER') }}"
-      password: "{{ lookup('env', 'MYSQL_PASSWORD') }}"
-      user_host: "{{ lookup('env', 'MYSQL_USER_HOST') }}"
 
 - name: Create database user
   community.mysql.mysql_user:
@@ -64,4 +87,5 @@
     host: "{{ mysql.user_host }}"
     priv: '*.*:ALL'
     state: present
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
