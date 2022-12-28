@@ -1,12 +1,13 @@
 #!/bin/bash
 
-IMAGE="wobgob/core"
-if [ -n "$2" ]; then
-    IMAGE="$2"
-fi
-
 case "${1:-''}" in
     'start')
+        if [ -z "$2" ]; then
+            echo "Usage: {{ realm.name }} start|stop IMAGE"
+            exit 1
+        fi
+
+        IMAGE="$2"
         docker run --name "{{ realm.name }}" --env MYSQL_USER="{{ mysql.user }}" \
             --env MYSQL_PASSWORD={{ mysql.password }} --env MYSQL_HOST={{ mysql.host }} \
             --env MYSQL_PORT={{ mysql.port }} --env ID={{ realm.id }} --env NAME={{ realm.name }} \
@@ -21,7 +22,7 @@ case "${1:-''}" in
         ;;
 
     *)
-        echo "Usage: {{ realm.name }} start|stop [image]"
+        echo "Usage: {{ realm.name }} start|stop IMAGE"
         exit 1
         ;;
 esac
