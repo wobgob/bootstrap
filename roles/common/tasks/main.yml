@@ -49,7 +49,7 @@
     - regexp: "^ClientAliveCountMax\ "
       line: "ClientAliveCountMax 0"
     - regexp: "^AllowTcpForwarding\ "
-      line: "AllowTcpForwarding no"
+      line: "AllowTcpForwarding yes"
     - regexp: "^X11Forwarding\ "
       line: "X11Forwarding no"
     - regexp: "^KexAlgorithms\ "
