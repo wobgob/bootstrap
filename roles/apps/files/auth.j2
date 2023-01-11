@@ -8,9 +8,8 @@ case "${1:-''}" in
         fi
 
         IMAGE="$2"
-        docker run --name auth --env MYSQL_USER={{ mysql.user }} \
-            --env MYSQL_PASSWORD={{ mysql.password }} --env MYSQL_HOST={{ mysql.host }} \
-            --env MYSQL_PORT={{ mysql.port }} --env AUTHSERVER=1 -p 3724:3724 -d "$IMAGE"
+        docker run --name auth --env-file /usr/local/etc/auth.env \
+            -p 3724:3724 -d "$IMAGE"
         exit 0
         ;;
 

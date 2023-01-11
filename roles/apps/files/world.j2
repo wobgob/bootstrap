@@ -8,10 +8,8 @@ case "${1:-''}" in
         fi
 
         IMAGE="$2"
-        docker run --name "{{ realm.name }}" --env MYSQL_USER="{{ mysql.user }}" \
-            --env MYSQL_PASSWORD={{ mysql.password }} --env MYSQL_HOST={{ mysql.host }} \
-            --env MYSQL_PORT={{ mysql.port }} --env ID={{ realm.id }} --env NAME={{ realm.name }} \
-            --env ZONE={{ realm.zone }} -p {{ realm.port }}:8085 -d -it "$IMAGE"
+        docker run --name "{{ realm.name }}" --env-file "/usr/local/etc/{{ realm.name }}.env" \
+            -p {{ realm.port }}:8085 -d -it "$IMAGE"
         exit 0
         ;;
 

@@ -53,6 +53,14 @@
     group: docker
     mode: '0770'
 
+- name: Copy auth environment
+  template:
+    src: files/auth.env.j2
+    dest: /usr/local/etc/auth.env
+    owner: root
+    group: docker
+    mode: '0770'
+
 - name: Copy world scripts
   template:
     src: files/world.j2
@@ -64,10 +72,29 @@
     realm: "{{ item }}"
   with_items: "{{ realms }}"
 
+- name: Copy world environments
+  template:
+    src: files/world.env.j2
+    dest: "/usr/local/etc/{{ item.name }}.env"
+    owner: root
+    group: docker
+    mode: '0770'
+  vars:
+    realm: "{{ item }}"
+  with_items: "{{ realms }}"
+
 - name: Copy winzig script
   template:
     src: files/winzig.j2
     dest: "/usr/local/bin/winzig"
+    owner: root
+    group: docker
+    mode: '0770'
+
+- name: Copy winzig environment
+  template:
+    src: files/winzig.env.j2
+    dest: "/usr/local/etc/winzig.env"
     owner: root
     group: docker
     mode: '0770'
